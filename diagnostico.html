@@ -244,6 +244,10 @@
           </div>
 
           <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off">
+          <input type="hidden" name="_subject" value="[Diagnóstico L-Vision] Novo pedido pelo site">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off">
 
           <button type="submit" class="btn btn-signal" id="submitBtn">Enviar diagnóstico</button>
           <p class="form-note">RESPOSTA EM ATÉ 1 DIA ÚTIL · SEM COMPROMISSO</p>
@@ -330,14 +334,18 @@ form.addEventListener('submit', function(e){
   submitBtn.textContent = 'Enviando...';
   statusBox.className = 'form-status';
 
-  fetch('enviar-contato.php', { method: 'POST', body: data })
-    .then(function(res){ return res.json(); })
-    .then(function(json){
-      if (json.ok) {
+  fetch('https://formsubmit.co/ajax/thiago2023leal@gmail.com', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' },
+    body: data
+  })
+    .then(function(res){ return res.json().then(function(json){ return { ok: res.ok, json: json }; }); })
+    .then(function(result){
+      if (result.ok) {
         showStatus('ok', 'Diagnóstico enviado! Vamos responder em até 1 dia útil.');
         form.reset();
       } else {
-        showStatus('err', json.message || 'Não foi possível enviar agora. Tente pelo WhatsApp.');
+        showStatus('err', (result.json && result.json.message) || 'Não foi possível enviar agora. Tente pelo WhatsApp.');
       }
     })
     .catch(function(){
