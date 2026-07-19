@@ -94,6 +94,8 @@
   /* niched services */
   .niche-row{ display:flex; gap:1px; background:var(--line); border:1px solid var(--line); }
   .niche{ flex:1; background:var(--ink); padding:28px 26px; }
+  a.niche{ display:block; text-decoration:none; transition:background .15s var(--ease); }
+  a.niche:hover{ background:var(--steel); }
   .niche span.tag{ font-family:var(--mono); font-size:10px; color:var(--fog); text-transform:uppercase; letter-spacing:.06em; }
   .niche h4{ font-family:var(--cond); font-weight:700; text-transform:uppercase; margin:10px 0 8px; font-size:1.1rem; color:#fff; }
   .niche p{ margin:0; font-size:.88rem; color:var(--mist); }
@@ -151,6 +153,7 @@
       <a href="engenharia.html">Engenharia</a>
       <a href="index.html#projetos">Projetos</a>
       <a href="index.html#empresa">Empresa</a>
+      <a href="pages/sobre.html">Sobre Nós</a>
     </nav>
     <a href="diagnostico.html" class="nav-cta" id="navCtaDesktop">Diagnóstico</a>
     <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
@@ -164,6 +167,7 @@
   <a href="engenharia.html">Engenharia</a>
   <a href="index.html#projetos">Projetos</a>
   <a href="index.html#empresa">Empresa</a>
+  <a href="pages/sobre.html">Sobre Nós</a>
   <a href="diagnostico.html" class="nav-cta">Solicitar diagnóstico</a>
 </div>
 
@@ -239,12 +243,12 @@
         <p>Duas demandas recorrentes dos nossos próprios clientes, atendidas com a mesma equipe técnica.</p>
       </div>
       <div class="niche-row reveal">
-        <div class="niche">
+        <a href="pages/rastreadores.html" class="niche">
           <span class="tag">Rastreamento veicular</span>
           <h4>GPS e Localizadores</h4>
           <p>Rastreadores veiculares de alta precisão para frotas e veículos particulares, além de localizadores
             discretos para objetos de valor e pets. Visualização de trajeto em tempo real pelo app.</p>
-        </div>
+        </a>
         <div class="niche">
           <span class="tag">Gravação esportiva</span>
           <h4>Quadras e Campos</h4>
@@ -327,7 +331,7 @@
     </div>
     <div class="footer-bottom">
       <div>© <span id="year"></span> L-Vision Segurança Eletrônica LTDA · CNPJ 54.855.199/0001-69</div>
-      <div class="legal"><a href="politica-de-privacidade.html">Política de Privacidade</a><a href="termos-de-servico.html">Termos de Serviço</a></div>
+      <div class="legal"><a href="politica-de-privacidade.html">Política de Privacidade</a><a href="https://grupolvision.com.br/pages/termos-de-servico.html">Termos de Serviço</a></div>
     </div>
   </div>
 </footer>
