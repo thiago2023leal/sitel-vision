@@ -2,6 +2,10 @@
 /**
  * Handler do formulário de diagnóstico (diagnostico.html).
  * Recebe POST, valida, envia e-mail via mail() nativo do PHP (sem dependências).
+ *
+ * O destino é um Gmail, não um endereço @grupolvision.com.br: esse domínio tem uma
+ * caixa local no cPanel com o mesmo nome da caixa real do Titan Email, e o servidor
+ * entrega mail() localmente nela — nunca chegava no Titan que é o e-mail realmente usado.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -48,7 +52,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     respond(false, 'E-mail inválido.');
 }
 
-$destino = 'thiagoleal@grupolvision.com.br';
+$destino = 'thiagoleal2023@gmail.com';
 $assunto = '[Diagnóstico L-Vision] ' . $perfil . ' — ' . $nome;
 
 $corpo = "Novo pedido de diagnóstico pelo site\n\n"
