@@ -1,0 +1,327 @@
+<title>L-Vision — Solicitar Diagnóstico</title>
+<style>
+  @font-face{ font-family:'Plex Sans'; font-weight:400; font-style:normal; src:url("assets/fonts/PlexSans-400.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Sans'; font-weight:600; font-style:normal; src:url("assets/fonts/PlexSans-600.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Sans'; font-weight:700; font-style:normal; src:url("assets/fonts/PlexSans-700.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Sans Condensed'; font-weight:700; font-style:normal; src:url("assets/fonts/PlexSansCond-700.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Mono'; font-weight:500; font-style:normal; src:url("assets/fonts/PlexMono-500.woff2") format('woff2'); font-display:swap; }
+
+  :root{
+    --ink:#0b0d10; --steel:#151920; --steel-2:#1b2129; --line:#262c34; --line-soft:#1a1f26;
+    --signal:#ff9d2e; --signal-dim:#5c3d18; --signal-wash:#231a10;
+    --pulse:#29e0c4; --pulse-dim:#134943; --pulse-wash:#0f2422;
+    --text:#eef1f3; --mist:#a9b1ba; --fog:#69727c;
+    --wa:#25d366; --err:#e6685e; --ok:#6fcf97;
+    --mono:'Plex Mono', ui-monospace, Consolas, monospace;
+    --sans:'Plex Sans', system-ui, -apple-system, sans-serif;
+    --cond:'Plex Sans Condensed', var(--sans);
+    --ease:cubic-bezier(.16,.8,.24,1);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ margin:0; background:var(--ink); color:var(--text); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  ::selection{ background:var(--signal); color:#1c1200; }
+  img,svg{ display:block; max-width:100%; }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+  .container{ max-width:1200px; margin:0 auto; padding:0 28px; }
+  :focus-visible{ outline:2px solid var(--pulse); outline-offset:3px; }
+
+  /* ============ HEADER ============ */
+  .site-header{ position:fixed; top:0; left:0; width:100%; z-index:200; background:rgba(11,13,16,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line-soft); }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; height:76px; gap:24px; }
+  .wordmark{ font-family:var(--cond); font-weight:700; font-size:1.25rem; letter-spacing:.02em; text-decoration:none; color:#fff; display:flex; align-items:center; gap:8px; }
+  .wordmark .px{ width:8px; height:8px; background:var(--signal); box-shadow:0 0 8px var(--signal); }
+  .wordmark span.dim{ color:var(--fog); font-weight:400; font-family:var(--mono); font-size:.7rem; margin-left:4px; }
+  .nav-links{ display:flex; align-items:center; gap:32px; }
+  .nav-links a{ font-size:.9rem; color:var(--mist); text-decoration:none; padding:4px 0; }
+  .nav-links a:hover{ color:#fff; }
+  .nav-cta{ font-family:var(--mono); font-size:.78rem; letter-spacing:.03em; text-transform:uppercase; text-decoration:none; background:var(--signal); color:#1c1200; padding:10px 18px; font-weight:500; transition:background .15s var(--ease), transform .15s var(--ease); white-space:nowrap; }
+  .nav-cta.active{ background:var(--pulse); }
+  .nav-cta:hover{ background:#ffb454; transform:translateY(-1px); }
+  .nav-toggle{ display:none; background:none; border:1px solid var(--line); color:var(--text); width:40px; height:40px; align-items:center; justify-content:center; }
+  @media (max-width:860px){ .nav-links{ display:none; } .nav-toggle{ display:flex; } #navCtaDesktop{ display:none !important; } }
+
+  /* ============ HERO ============ */
+  .hero{ padding:160px 0 60px; }
+  .kicker{ font-family:var(--mono); font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--signal); display:flex; align-items:center; gap:9px; margin-bottom:20px; }
+  .hero h1{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:clamp(2.1rem,4.6vw,3.2rem); line-height:1.04; margin:0 0 18px; color:#fff; text-wrap:balance; }
+  .hero .lede{ font-size:1.05rem; color:var(--mist); max-width:64ch; margin:0; }
+
+  /* ============ FORM LAYOUT ============ */
+  .diag-grid{ display:grid; grid-template-columns:1fr 1.3fr; gap:48px; padding-bottom:100px; align-items:start; }
+  @media (max-width:900px){ .diag-grid{ grid-template-columns:1fr; } }
+
+  .info-card{ border:1px solid var(--line); background:var(--steel); padding:32px; }
+  .info-card h3{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:1.05rem; margin:0 0 20px; color:#fff; }
+  .info-item{ display:flex; gap:12px; align-items:flex-start; margin-bottom:20px; }
+  .info-item:last-child{ margin-bottom:0; }
+  .info-item svg{ width:18px; height:18px; color:var(--signal); flex-shrink:0; margin-top:2px; }
+  .info-item a, .info-item span{ color:var(--mist); font-size:.9rem; text-decoration:none; line-height:1.5; }
+  .info-item a:hover{ color:#fff; }
+  .info-note{ margin-top:28px; padding-top:24px; border-top:1px solid var(--line-soft); font-family:var(--mono); font-size:.78rem; color:var(--fog); }
+
+  .form-card{ border:1px solid var(--line); background:var(--steel); padding:36px; }
+  .form-card h3{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:1.05rem; margin:0 0 6px; color:#fff; }
+  .form-card .sub{ color:var(--fog); font-size:.85rem; margin:0 0 28px; }
+
+  .segment{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:24px; }
+  @media (max-width:560px){ .segment{ grid-template-columns:repeat(2,1fr); } }
+  .segment label{ position:relative; }
+  .segment input{ position:absolute; opacity:0; }
+  .segment span{ display:flex; align-items:center; justify-content:center; text-align:center; padding:14px 8px; background:var(--ink); font-size:.8rem; color:var(--mist); cursor:pointer; transition:background .15s var(--ease), color .15s var(--ease); }
+  .segment input:checked + span{ background:var(--signal-wash); color:var(--signal); font-weight:600; }
+  .segment input:focus-visible + span{ outline:2px solid var(--pulse); outline-offset:-2px; }
+
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:.82rem; color:var(--mist); margin-bottom:7px; font-weight:600; }
+  .field input, .field textarea{ width:100%; background:var(--ink); border:1px solid var(--line); color:var(--text); padding:12px 14px; font-family:var(--sans); font-size:.92rem; border-radius:2px; }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--signal); }
+  .field textarea{ min-height:110px; resize:vertical; }
+  .checks{ display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin-bottom:24px; }
+  @media (max-width:480px){ .checks{ grid-template-columns:1fr; } }
+  .check-item{ display:flex; align-items:center; gap:9px; font-size:.86rem; color:var(--mist); }
+  .check-item input{ accent-color:var(--signal); width:16px; height:16px; }
+  .hp{ position:absolute; left:-9999px; }
+
+  .btn{ font-family:var(--mono); font-size:.82rem; letter-spacing:.03em; text-transform:uppercase; text-decoration:none; padding:15px 26px; display:inline-flex; align-items:center; justify-content:center; gap:10px; font-weight:500; border:1px solid transparent; transition:transform .15s var(--ease), background .15s var(--ease); cursor:pointer; width:100%; }
+  .btn-signal{ background:var(--signal); color:#1c1200; }
+  .btn-signal:hover{ background:#ffb454; transform:translateY(-2px); }
+  .btn-signal:disabled{ opacity:.6; cursor:default; transform:none; }
+  .form-note{ font-family:var(--mono); font-size:.75rem; color:var(--fog); margin-top:14px; text-align:center; }
+
+  .form-status{ display:none; padding:14px 16px; border-radius:2px; font-size:.88rem; margin-bottom:20px; }
+  .form-status.show{ display:block; }
+  .form-status.ok{ background:rgba(111,207,151,.1); border:1px solid var(--ok); color:var(--ok); }
+  .form-status.err{ background:rgba(230,104,94,.1); border:1px solid var(--err); color:var(--err); }
+
+  /* ============ FOOTER ============ */
+  .site-footer{ border-top:1px solid var(--line-soft); padding:72px 0 28px; background:var(--steel); }
+  .footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:48px; margin-bottom:56px; }
+  @media (max-width:860px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px){ .footer-grid{ grid-template-columns:1fr; } }
+  .footer-brand p{ color:var(--fog); font-size:.85rem; max-width:34ch; margin:14px 0 0; }
+  .footer-col h5{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--fog); margin:0 0 16px; }
+  .footer-col a{ display:block; color:var(--mist); text-decoration:none; font-size:.88rem; margin-bottom:10px; }
+  .footer-col a:hover{ color:#fff; }
+  .footer-bottom{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; padding-top:28px; border-top:1px solid var(--line-soft); font-family:var(--mono); font-size:.75rem; color:var(--fog); }
+  .footer-bottom .legal a{ color:var(--fog); text-decoration:none; margin-left:20px; }
+  .footer-bottom .legal a:hover{ color:var(--mist); }
+
+  .wa-float{ position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:var(--wa); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,.4); z-index:150; text-decoration:none; transition:transform .15s var(--ease); }
+  .wa-float:hover{ transform:scale(1.07); }
+  .wa-float svg{ width:28px; height:28px; }
+
+  .mobile-nav{ position:fixed; inset:76px 0 0 0; background:var(--ink); z-index:190; transform:translateX(100%); transition:transform .3s var(--ease); padding:32px 28px; display:flex; flex-direction:column; gap:4px; }
+  .mobile-nav.open{ transform:translateX(0); }
+  .mobile-nav a{ padding:16px 0; border-bottom:1px solid var(--line-soft); text-decoration:none; color:var(--text); font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:1.2rem; }
+  .mobile-nav .nav-cta{ margin-top:24px; text-align:center; justify-content:center; }
+</style>
+
+<header class="site-header">
+  <div class="container nav-row">
+    <a href="index.html" class="wordmark"><span class="px"></span>L·VISION<span class="dim">// SEGURANÇA</span></a>
+    <nav class="nav-links">
+      <a href="sistemas.html">Sistemas</a>
+      <a href="engenharia.html">Engenharia</a>
+      <a href="index.html#projetos">Projetos</a>
+      <a href="index.html#empresa">Empresa</a>
+    </nav>
+    <a href="diagnostico.html" class="nav-cta active" id="navCtaDesktop">Diagnóstico</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="sistemas.html">Sistemas</a>
+  <a href="engenharia.html">Engenharia</a>
+  <a href="index.html#projetos">Projetos</a>
+  <a href="index.html#empresa">Empresa</a>
+  <a href="diagnostico.html" class="nav-cta">Solicitar diagnóstico</a>
+</div>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="kicker"><span class="rec"></span>DIAGNÓSTICO GRATUITO · RESPOSTA EM ATÉ 1 DIA ÚTIL</div>
+      <h1>Qual é o seu caso?</h1>
+      <p class="lede">Conte o que precisa e para quem — o formulário já chega qualificado para quem for
+        responder, sem ida e volta de mensagens genéricas.</p>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="diag-grid">
+      <div class="info-card">
+        <h3>Fale direto com a gente</h3>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <a href="https://wa.me/5511954285958" target="_blank" rel="noopener">WhatsApp (11) 95428-5958</a>
+        </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:thiagoleal@grupolvision.com.br">thiagoleal@grupolvision.com.br</a>
+        </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <a href="https://maps.google.com/?q=R.+Felipe+Cardoso+de+Campos,+378/291+-+Perus,+São+Paulo+-+SP,+05207-090" target="_blank" rel="noopener">R. Felipe Cardoso de Campos, 378/291<br>Perus, São Paulo — SP, 05207-090</a>
+        </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          <a href="https://instagram.com/lvision.s.e" target="_blank" rel="noopener">@lvision.s.e</a>
+        </div>
+        <div class="info-note">
+          L-VISION SEGURANÇA ELETRÔNICA LTDA<br>CNPJ 54.855.199/0001-69
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Enviar diagnóstico</h3>
+        <p class="sub">Todos os campos com * são obrigatórios.</p>
+
+        <div class="form-status" id="formStatus"></div>
+
+        <form id="diagForm" novalidate>
+          <div class="segment" role="radiogroup" aria-label="Tipo de caso">
+            <label><input type="radio" name="perfil" value="Residência" checked><span>Residência</span></label>
+            <label><input type="radio" name="perfil" value="Condomínio"><span>Condomínio</span></label>
+            <label><input type="radio" name="perfil" value="Empresa"><span>Empresa</span></label>
+            <label><input type="radio" name="perfil" value="Profissional de segurança"><span>Profissional</span></label>
+          </div>
+
+          <div class="field">
+            <label>Serviços de interesse</label>
+            <div class="checks">
+              <label class="check-item"><input type="checkbox" name="servicos" value="CFTV">Câmeras (CFTV)</label>
+              <label class="check-item"><input type="checkbox" name="servicos" value="Alarme">Alarme</label>
+              <label class="check-item"><input type="checkbox" name="servicos" value="Controle de Acesso">Controle de acesso</label>
+              <label class="check-item"><input type="checkbox" name="servicos" value="Portaria Remota">Portaria remota</label>
+              <label class="check-item"><input type="checkbox" name="servicos" value="Rastreamento">Rastreamento veicular</label>
+              <label class="check-item"><input type="checkbox" name="servicos" value="Gravação Esportiva">Gravação esportiva</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="nome">Nome completo *</label>
+            <input type="text" id="nome" name="nome" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="telefone">Telefone / WhatsApp *</label>
+            <input type="tel" id="telefone" name="telefone" required autocomplete="tel" placeholder="(00) 00000-0000">
+          </div>
+          <div class="field">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="mensagem">Conte o que precisa *</label>
+            <textarea id="mensagem" name="mensagem" required placeholder="Ex: câmeras para uma casa de 2 andares, quero também avaliar alarme..."></textarea>
+          </div>
+
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off">
+
+          <button type="submit" class="btn btn-signal" id="submitBtn">Enviar diagnóstico</button>
+          <p class="form-note">RESPOSTA EM ATÉ 1 DIA ÚTIL · SEM COMPROMISSO</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="wordmark"><span class="px"></span>L·VISION</a>
+        <p>Engenharia de segurança eletrônica e tecnologia própria. Perus, São Paulo — SP.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Sistemas</h5>
+        <a href="sistemas.html#mod01">Câmeras (CFTV)</a>
+        <a href="sistemas.html#mod02">Alarme</a>
+        <a href="sistemas.html#mod03">Controle de acesso</a>
+        <a href="sistemas.html#mod04">Portaria remota</a>
+      </div>
+      <div class="footer-col">
+        <h5>Empresa</h5>
+        <a href="engenharia.html">Engenharia</a>
+        <a href="index.html#projetos">Projetos</a>
+        <a href="index.html#empresa">Certificações</a>
+        <a href="diagnostico.html">Diagnóstico</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contato</h5>
+        <a href="https://wa.me/5511954285958" target="_blank" rel="noopener">(11) 95428-5958</a>
+        <a href="mailto:thiagoleal@grupolvision.com.br">thiagoleal@grupolvision.com.br</a>
+        <a href="https://instagram.com/lvision.s.e" target="_blank" rel="noopener">@lvision.s.e</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© <span id="year"></span> L-Vision Segurança Eletrônica LTDA · CNPJ 54.855.199/0001-69</div>
+      <div class="legal"><a href="politica-de-privacidade.html">Política de Privacidade</a><a href="termos-de-servico.html">Termos de Serviço</a></div>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/5511954285958" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3 9 3 16c0 2.4.7 4.7 1.9 6.7L3 29l6.5-1.8c1.9 1 4 1.6 6.5 1.6 7 0 13-6 13-13S23 3 16 3zm0 23.7c-2.1 0-4.1-.6-5.8-1.6l-.4-.2-4 1.1 1.1-3.9-.3-.4C5.5 20 4.9 18 4.9 16 4.9 10 10 4.9 16 4.9S27.1 10 27.1 16 22 26.7 16 26.7zm6.9-8.2c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.3-.9 1.2-1.1 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.6.2-.2.2-.4.3-.6.1-.2.1-.5 0-.7-.1-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.3 1.2-1.3 3s1.3 3.5 1.5 3.7c.2.2 2.6 4 6.3 5.5.9.4 1.6.6 2.1.7.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5z"/></svg>
+</a>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+var navToggle = document.getElementById('navToggle');
+var mobileNav = document.getElementById('mobileNav');
+navToggle.addEventListener('click', function(){
+  var open = mobileNav.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open);
+  navToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+});
+mobileNav.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){
+    mobileNav.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', false);
+    navToggle.setAttribute('aria-label', 'Abrir menu');
+  });
+});
+
+var form = document.getElementById('diagForm');
+var statusBox = document.getElementById('formStatus');
+var submitBtn = document.getElementById('submitBtn');
+
+function showStatus(kind, text){
+  statusBox.textContent = text;
+  statusBox.className = 'form-status show ' + kind;
+}
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+
+  if (form.website.value) { return; } // honeypot
+
+  var data = new FormData(form);
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+  statusBox.className = 'form-status';
+
+  fetch('enviar-contato.php', { method: 'POST', body: data })
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      if (json.ok) {
+        showStatus('ok', 'Diagnóstico enviado! Vamos responder em até 1 dia útil.');
+        form.reset();
+      } else {
+        showStatus('err', json.message || 'Não foi possível enviar agora. Tente pelo WhatsApp.');
+      }
+    })
+    .catch(function(){
+      showStatus('err', 'Não foi possível enviar agora. Tente pelo WhatsApp ou e-mail direto.');
+    })
+    .finally(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar diagnóstico';
+    });
+});
+</script>
