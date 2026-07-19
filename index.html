@@ -1,0 +1,707 @@
+<title>L-Vision — Engenharia de Segurança</title>
+<style>
+  @font-face{ font-family:'Plex Sans'; font-weight:400; font-style:normal; src:url("assets/fonts/PlexSans-400.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Sans'; font-weight:600; font-style:normal; src:url("assets/fonts/PlexSans-600.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Sans'; font-weight:700; font-style:normal; src:url("assets/fonts/PlexSans-700.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Sans Condensed'; font-weight:700; font-style:normal; src:url("assets/fonts/PlexSansCond-700.woff2") format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Plex Mono'; font-weight:500; font-style:normal; src:url("assets/fonts/PlexMono-500.woff2") format('woff2'); font-display:swap; }
+
+  :root{
+    --ink:#0b0d10; --steel:#151920; --steel-2:#1b2129; --line:#262c34; --line-soft:#1a1f26;
+    --signal:#ff9d2e; --signal-2:#e8862e; --signal-dim:#5c3d18; --signal-wash:#231a10;
+    --pulse:#29e0c4; --pulse-dim:#134943; --pulse-wash:#0f2422;
+    --paper:#f2efe6; --paper-ink:#201e19; --paper-line:#d8d3c4;
+    --text:#eef1f3; --mist:#a9b1ba; --fog:#69727c;
+    --wa:#25d366;
+    --mono:'Plex Mono', ui-monospace, Consolas, monospace;
+    --sans:'Plex Sans', system-ui, -apple-system, sans-serif;
+    --cond:'Plex Sans Condensed', var(--sans);
+    --ease:cubic-bezier(.16,.8,.24,1);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--ink); color:var(--text); font-family:var(--sans); font-size:16px;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--signal); color:#1c1200; }
+  img,svg{ display:block; max-width:100%; }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+  .container{ max-width:1200px; margin:0 auto; padding:0 28px; }
+  .mono{ font-family:var(--mono); }
+  .sr-only{ position:absolute; width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap; }
+  :focus-visible{ outline:2px solid var(--pulse); outline-offset:3px; }
+
+  /* ============ HEADER ============ */
+  .site-header{
+    position:fixed; top:0; left:0; width:100%; z-index:200;
+    background:rgba(11,13,16,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line-soft); transition:background .3s var(--ease);
+  }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; height:76px; gap:24px; }
+  .wordmark{ font-family:var(--cond); font-weight:700; font-size:1.25rem; letter-spacing:.02em; text-decoration:none; color:#fff; display:flex; align-items:center; gap:8px; }
+  .wordmark .px{ width:8px; height:8px; background:var(--signal); box-shadow:0 0 8px var(--signal); }
+  .wordmark span.dim{ color:var(--fog); font-weight:400; font-family:var(--mono); font-size:.7rem; margin-left:4px; }
+  .nav-links{ display:flex; align-items:center; gap:32px; }
+  .nav-links a{
+    font-size:.9rem; color:var(--mist); text-decoration:none; position:relative; padding:4px 0;
+  }
+  .nav-links a:hover{ color:#fff; }
+  .nav-cta{
+    font-family:var(--mono); font-size:.78rem; letter-spacing:.03em; text-transform:uppercase; text-decoration:none;
+    background:var(--signal); color:#1c1200; padding:10px 18px; font-weight:500; transition:background .15s var(--ease), transform .15s var(--ease);
+    white-space:nowrap;
+  }
+  .nav-cta:hover{ background:#ffb454; transform:translateY(-1px); }
+  .nav-toggle{ display:none; background:none; border:1px solid var(--line); color:var(--text); width:40px; height:40px; align-items:center; justify-content:center; }
+  @media (max-width:860px){
+    .nav-links{ display:none; }
+    .nav-toggle{ display:flex; }
+    #navCtaDesktop{ display:none !important; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .kicker .rec{ animation:none; }
+  }
+
+  /* ============ HERO ============ */
+  .hero{ padding:168px 0 96px; position:relative; overflow:hidden; }
+  .hero::before{
+    content:''; position:absolute; inset:0; z-index:-1;
+    background:
+      radial-gradient(ellipse 1000px 560px at 10% -10%, rgba(255,157,46,.09), transparent 60%),
+      radial-gradient(ellipse 900px 620px at 100% 10%, rgba(41,224,196,.07), transparent 60%);
+  }
+  .hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:64px; align-items:center; }
+  @media (max-width:980px){ .hero-grid{ grid-template-columns:1fr; gap:56px; } }
+
+  .kicker{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--signal);
+    display:flex; align-items:center; gap:9px; margin-bottom:24px;
+  }
+  .kicker .rec{ width:6px; height:6px; border-radius:50%; background:var(--signal); box-shadow:0 0 8px var(--signal); animation:blink 1.4s infinite; }
+  @keyframes blink{ 50%{ opacity:.2; } }
+
+  .hero h1{
+    font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:clamp(2.4rem,5.6vw,4.1rem);
+    line-height:1.03; letter-spacing:.001em; margin:0 0 26px; color:#fff; text-wrap:balance;
+  }
+  .hero h1 .strike{ text-decoration:line-through; text-decoration-color:rgba(255,255,255,.28); text-decoration-thickness:2px; color:var(--mist); }
+  .hero h1 em{ font-style:normal; color:var(--signal); }
+  .hero .lede{ font-size:1.13rem; color:var(--mist); max-width:52ch; margin:0 0 36px; }
+  .hero .lede b{ color:#fff; font-weight:600; }
+
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+  .btn{
+    font-family:var(--mono); font-size:.82rem; letter-spacing:.03em; text-transform:uppercase; text-decoration:none;
+    padding:15px 26px; display:inline-flex; align-items:center; gap:10px; font-weight:500; border:1px solid transparent;
+    transition:transform .15s var(--ease), background .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease);
+    cursor:pointer;
+  }
+  .btn-signal{ background:var(--signal); color:#1c1200; }
+  .btn-signal:hover{ background:#ffb454; transform:translateY(-2px); }
+  .btn-pulse{ background:transparent; color:var(--pulse); border-color:var(--pulse-dim); }
+  .btn-pulse:hover{ background:var(--pulse-wash); border-color:var(--pulse); transform:translateY(-2px); }
+  .btn svg{ width:16px; height:16px; }
+
+  .hero-note{ font-size:.82rem; color:var(--fog); font-family:var(--mono); }
+
+  /* radar / operations panel visual */
+  .op-panel{ position:relative; }
+  .op-label{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--fog); }
+  .op-label b{ color:var(--mist); font-weight:500; }
+  .op-frame{
+    position:relative; border:1px solid var(--line); background:var(--steel);
+    aspect-ratio:1/1; width:100%; max-width:440px; margin:0 auto;
+  }
+  .op-frame::before,.op-frame::after{ content:''; position:absolute; width:16px; height:16px; border:1.5px solid var(--signal); opacity:.6; }
+  .op-frame::before{ top:-1px; left:-1px; border-right:none; border-bottom:none; }
+  .op-frame::after{ bottom:-1px; right:-1px; border-left:none; border-top:none; }
+  #radar{ width:100%; height:100%; display:block; }
+  .op-caption{ text-align:center; font-family:var(--mono); font-size:10px; color:var(--fog); margin-top:12px; letter-spacing:.04em; }
+
+  /* ============ STATS PANEL ============ */
+  .panel-strip{ border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft); background:var(--steel); }
+  .panel-grid{ display:grid; grid-template-columns:repeat(4,1fr); }
+  .panel-item{ padding:26px 22px; border-left:1px solid var(--line-soft); }
+  .panel-item:first-child{ border-left:none; }
+  .panel-item .n{ font-family:var(--mono); font-size:1.5rem; color:#fff; font-variant-numeric:tabular-nums; }
+  .panel-item .l{ font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--fog); margin-top:6px; }
+  @media (max-width:760px){ .panel-grid{ grid-template-columns:repeat(2,1fr); } .panel-item{ border-left:none; border-top:1px solid var(--line-soft); } .panel-item:nth-child(odd){ border-right:1px solid var(--line-soft); } }
+
+  /* ============ SECTION SCAFFOLD ============ */
+  .stage{ padding:120px 0; }
+  .stage.tight{ padding:96px 0; }
+  .stage-head{ max-width:640px; margin-bottom:56px; }
+  .eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--signal); margin-bottom:16px; display:block; }
+  .eyebrow.pulse{ color:var(--pulse); }
+  .stage-head h2{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:clamp(1.7rem,3.4vw,2.5rem); margin:0 0 16px; color:#fff; letter-spacing:.005em; text-wrap:balance; }
+  .stage-head p{ color:var(--mist); font-size:1.02rem; margin:0; max-width:60ch; }
+
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s var(--ease), transform .7s var(--ease); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; transition:none; } }
+
+  /* ============ MODULES (sistemas) ============ */
+  .modules{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .module{ background:var(--ink); padding:32px 26px; transition:background .2s var(--ease); position:relative; }
+  .module:hover{ background:var(--steel); }
+  .module .code{ font-family:var(--mono); font-size:10.5px; color:var(--signal); letter-spacing:.06em; display:block; margin-bottom:18px; }
+  .module h3{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:1.15rem; margin:0 0 10px; color:#fff; }
+  .module p{ font-size:.88rem; color:var(--mist); margin:0 0 18px; }
+  .module .go{ font-family:var(--mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; color:var(--fog); text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .module:hover .go{ color:var(--signal); }
+  @media (max-width:900px){ .modules{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .modules{ grid-template-columns:1fr; } }
+
+  .system-note{ display:flex; gap:16px; align-items:flex-start; margin-top:28px; padding:20px 24px; border:1px solid var(--line); background:var(--steel); max-width:760px; }
+  .system-note svg{ width:20px; height:20px; color:var(--signal); flex-shrink:0; margin-top:2px; }
+  .system-note p{ margin:0; font-size:.9rem; color:var(--mist); }
+
+  /* niched services */
+  .niche-row{ display:flex; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:56px; }
+  .niche{ flex:1; background:var(--ink); padding:24px 26px; }
+  .niche span.tag{ font-family:var(--mono); font-size:10px; color:var(--fog); text-transform:uppercase; letter-spacing:.06em; }
+  .niche h4{ font-family:var(--cond); font-weight:700; text-transform:uppercase; margin:8px 0 6px; font-size:1rem; color:var(--mist); }
+  .niche p{ margin:0; font-size:.85rem; color:var(--fog); }
+  @media (max-width:700px){ .niche-row{ flex-direction:column; } }
+
+  /* ============ ENGENHARIA (app proof) ============ */
+  .stage.tech{ background:linear-gradient(180deg, transparent, var(--pulse-wash) 40%, transparent); }
+  .tech-grid{ display:grid; grid-template-columns:.95fr 1.05fr; gap:64px; align-items:center; }
+  @media (max-width:980px){ .tech-grid{ grid-template-columns:1fr; } }
+  .tech-copy p.body{ color:var(--mist); font-size:1.02rem; margin-bottom:28px; }
+  .tech-feats{ display:flex; flex-direction:column; gap:0; margin-bottom:32px; border-top:1px solid var(--line-soft); }
+  .tech-feat{ display:flex; gap:16px; padding:16px 0; border-bottom:1px solid var(--line-soft); align-items:baseline; }
+  .tech-feat .idx{ font-family:var(--mono); font-size:.75rem; color:var(--pulse); flex-shrink:0; width:28px; }
+  .tech-feat b{ color:#fff; font-size:.95rem; display:block; }
+  .tech-feat span{ color:var(--fog); font-size:.85rem; }
+  .tech-fine{ font-size:.85rem; color:var(--fog); max-width:46ch; }
+  .tech-fine a{ color:var(--pulse); text-decoration:underline; text-underline-offset:3px; }
+
+  /* phone mockup - pure CSS, no external image */
+  .phone{ width:100%; max-width:300px; margin:0 auto; }
+  .phone-frame{ border:1px solid var(--line); background:var(--steel); border-radius:18px; padding:10px; box-shadow:0 40px 80px -30px rgba(41,224,196,.15); }
+  .phone-screen{ background:var(--ink); border-radius:10px; padding:18px 16px; aspect-ratio:9/17.5; display:flex; flex-direction:column; gap:14px; overflow:hidden; }
+  .phone-topbar{ display:flex; justify-content:space-between; font-family:var(--mono); font-size:9px; color:var(--fog); }
+  .phone-title{ font-family:var(--cond); font-weight:700; color:#fff; font-size:1rem; text-transform:uppercase; }
+  .phone-card{ background:var(--steel-2); border:1px solid var(--line-soft); padding:12px; }
+  .phone-card .cap{ font-family:var(--mono); font-size:8px; color:var(--pulse); letter-spacing:.05em; text-transform:uppercase; margin-bottom:8px; }
+  .bar-row{ display:flex; align-items:flex-end; gap:5px; height:44px; }
+  .bar-row i{ flex:1; background:linear-gradient(180deg, var(--pulse), var(--pulse-dim)); border-radius:1px; }
+  .phone-list div{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line-soft); font-size:9.5px; color:var(--mist); }
+  .phone-list div:last-child{ border-bottom:none; }
+  .phone-fab{ margin-top:auto; align-self:flex-end; width:34px; height:34px; background:var(--pulse); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#04211d; font-size:16px; font-weight:700; }
+
+  /* ============ DOSSIERS (projetos) ============ */
+  .dossiers{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media (max-width:900px){ .dossiers{ grid-template-columns:1fr; } }
+  .dossier{ background:var(--paper); color:var(--paper-ink); padding:0; border:1px solid var(--paper-line); }
+  .dossier-top{ padding:20px 22px 16px; border-bottom:1px dashed var(--paper-line); }
+  .dossier-top .tag{ font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:#8a6a1a; display:block; margin-bottom:8px; }
+  .dossier-top h4{ font-family:var(--cond); font-weight:700; margin:0; font-size:1.05rem; text-transform:uppercase; }
+  .dossier-top .loc{ font-size:.78rem; color:#5c574a; margin-top:4px; }
+  .dossier svg{ width:100%; height:110px; display:block; background:#e9e5d8; }
+  .dossier-body{ padding:16px 22px 22px; }
+  .dossier-body dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:5px 12px; font-size:.8rem; }
+  .dossier-body dt{ font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:#8a6a1a; align-self:start; padding-top:2px; }
+  .dossier-body dd{ margin:0; color:#3a352c; }
+
+  /* ============ AUTHORITY STRIP ============ */
+  .authority{ border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft); padding:22px 0; }
+  .authority-row{ display:flex; flex-wrap:wrap; gap:14px 40px; justify-content:center; font-family:var(--mono); font-size:11px; letter-spacing:.05em; color:var(--fog); text-transform:uppercase; }
+  .authority-row b{ color:var(--mist); font-weight:500; }
+
+  /* ============ FINAL CTA ============ */
+  .final-cta{ text-align:center; }
+  .final-cta h2{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:clamp(1.9rem,4vw,2.8rem); color:#fff; margin:0 0 18px; }
+  .final-cta > .container > p{ color:var(--mist); max-width:56ch; margin:0 auto 48px; }
+  .path-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); max-width:880px; margin:0 auto; }
+  @media (max-width:700px){ .path-grid{ grid-template-columns:1fr; } }
+  .path{ background:var(--ink); padding:44px 36px; text-align:left; text-decoration:none; display:block; transition:background .2s var(--ease); }
+  .path:hover{ background:var(--steel); }
+  .path .tag{ font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:14px; display:block; }
+  .path.signal .tag{ color:var(--signal); }
+  .path.pulse .tag{ color:var(--pulse); }
+  .path h3{ font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:1.3rem; margin:0 0 10px; color:#fff; }
+  .path p{ font-size:.88rem; color:var(--mist); margin:0 0 20px; }
+  .path .arrow{ font-family:var(--mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; display:inline-flex; align-items:center; gap:8px; }
+  .path.signal .arrow{ color:var(--signal); }
+  .path.pulse .arrow{ color:var(--pulse); }
+  .direct-contact{ margin-top:40px; font-family:var(--mono); font-size:.85rem; color:var(--fog); }
+  .direct-contact a{ color:var(--mist); text-decoration:underline; text-underline-offset:3px; }
+
+  /* ============ FOOTER ============ */
+  .site-footer{ border-top:1px solid var(--line-soft); padding:72px 0 28px; background:var(--steel); }
+  .footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:48px; margin-bottom:56px; }
+  @media (max-width:860px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px){ .footer-grid{ grid-template-columns:1fr; } }
+  .footer-brand p{ color:var(--fog); font-size:.85rem; max-width:34ch; margin:14px 0 0; }
+  .footer-col h5{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--fog); margin:0 0 16px; }
+  .footer-col a{ display:block; color:var(--mist); text-decoration:none; font-size:.88rem; margin-bottom:10px; }
+  .footer-col a:hover{ color:#fff; }
+  .footer-bottom{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; padding-top:28px; border-top:1px solid var(--line-soft); font-family:var(--mono); font-size:.75rem; color:var(--fog); }
+  .footer-bottom .legal a{ color:var(--fog); text-decoration:none; margin-left:20px; }
+  .footer-bottom .legal a:hover{ color:var(--mist); }
+
+  /* ============ WHATSAPP FLOAT ============ */
+  .wa-float{
+    position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:var(--wa);
+    display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,.4); z-index:150;
+    text-decoration:none; transition:transform .15s var(--ease);
+  }
+  .wa-float:hover{ transform:scale(1.07); }
+  .wa-float svg{ width:28px; height:28px; }
+
+  /* mobile nav sheet */
+  .mobile-nav{
+    position:fixed; inset:76px 0 0 0; background:var(--ink); z-index:190; transform:translateX(100%);
+    transition:transform .3s var(--ease); padding:32px 28px; display:flex; flex-direction:column; gap:4px;
+  }
+  .mobile-nav.open{ transform:translateX(0); }
+  .mobile-nav a{ padding:16px 0; border-bottom:1px solid var(--line-soft); text-decoration:none; color:var(--text); font-family:var(--cond); font-weight:700; text-transform:uppercase; font-size:1.2rem; }
+  .mobile-nav .nav-cta{ margin-top:24px; text-align:center; justify-content:center; }
+</style>
+
+<header class="site-header">
+  <div class="container nav-row">
+    <a href="#topo" class="wordmark"><span class="px"></span>L·VISION<span class="dim">// SEGURANÇA</span></a>
+    <nav class="nav-links">
+      <a href="#sistemas">Sistemas</a>
+      <a href="#engenharia">Engenharia</a>
+      <a href="#projetos">Projetos</a>
+      <a href="#empresa">Empresa</a>
+    </nav>
+    <a href="#diagnostico" class="nav-cta" id="navCtaDesktop">Diagnóstico</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#sistemas">Sistemas</a>
+  <a href="#engenharia">Engenharia</a>
+  <a href="#projetos">Projetos</a>
+  <a href="#empresa">Empresa</a>
+  <a href="#diagnostico" class="nav-cta">Solicitar diagnóstico</a>
+</div>
+
+<main id="topo">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker"><span class="rec"></span>ENGENHARIA DE SEGURANÇA · PERUS, SÃO PAULO</div>
+        <h1>Não vendemos<br><span class="strike">câmera.</span><br>Projetamos <em>sistema.</em></h1>
+        <p class="lede">Somos a única empresa do setor na região que também <b>desenvolve o próprio software</b>
+          — um portfólio que já inclui um ERP para empresas de segurança, um app de escalas e plantões, e um
+          app de finanças com IA. Aplicamos a mesma engenharia em cada câmera, alarme e portaria que instalamos.</p>
+        <div class="hero-ctas">
+          <a href="#diagnostico" class="btn btn-signal">Solicitar diagnóstico técnico
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="engenharia.html" class="btn btn-pulse">Ver o portfólio de software</a>
+        </div>
+        <p class="hero-note">DIAGNÓSTICO PRESENCIAL GRATUITO · RESPOSTA EM ATÉ 1 DIA ÚTIL</p>
+      </div>
+
+      <div class="op-panel reveal">
+        <div class="op-label"><span>Painel de operação</span><b>ilustrativo</b></div>
+        <div class="op-frame"><canvas id="radar" width="440" height="440"></canvas></div>
+        <p class="op-caption">REPRESENTAÇÃO DO MODELO DE MONITORAMENTO INTEGRADO L-VISION</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS PANEL ============ -->
+  <div class="panel-strip">
+    <div class="container">
+      <div class="panel-grid">
+        <div class="panel-item"><div class="n">15+</div><div class="l">Anos de operação</div></div>
+        <div class="panel-item"><div class="n">5.000+</div><div class="l">Equipamentos instalados</div></div>
+        <div class="panel-item"><div class="n">24/7</div><div class="l">Suporte técnico</div></div>
+        <div class="panel-item"><div class="n">1</div><div class="l">Software próprio em produção</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SISTEMAS ============ -->
+  <section class="stage" id="sistemas">
+    <div class="container">
+      <div class="stage-head reveal">
+        <span class="eyebrow">01 · Segurança física</span>
+        <h2>Quatro módulos.<br>Um sistema só.</h2>
+        <p>Câmera, alarme, controle de acesso e portaria não deveriam ser quatro orçamentos separados de quatro
+          fornecedores diferentes. Projetamos os quatro como camadas de um único sistema — um ponto de contato,
+          uma equipe responsável do início ao fim.</p>
+      </div>
+
+      <div class="modules reveal">
+        <div class="module">
+          <span class="code">MOD.01 — CFTV</span>
+          <h3>Câmeras</h3>
+          <p>Monitoramento HD a 4K, acesso remoto por app e gravação redundante em nuvem e local.</p>
+          <a href="#" class="go">Ver módulo →</a>
+        </div>
+        <div class="module">
+          <span class="code">MOD.02 — ALM</span>
+          <h3>Alarme</h3>
+          <p>Sensores perimetrais e internos com resposta imediata via central 4G/Wi-Fi.</p>
+          <a href="#" class="go">Ver módulo →</a>
+        </div>
+        <div class="module">
+          <span class="code">MOD.03 — ACS</span>
+          <h3>Acesso</h3>
+          <p>Biometria facial, digital e RFID com registro auditável de entrada e saída.</p>
+          <a href="#" class="go">Ver módulo →</a>
+        </div>
+        <div class="module">
+          <span class="code">MOD.04 — PRT</span>
+          <h3>Portaria</h3>
+          <p>Operação remota autônoma, integrada aos três módulos acima em uma única central.</p>
+          <a href="#" class="go">Ver módulo →</a>
+        </div>
+      </div>
+
+      <div class="system-note reveal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <p>Cada módulo funciona sozinho, mas é projetado para operar junto: o alarme aciona a câmera mais próxima,
+          o controle de acesso alimenta o mesmo relatório da portaria. É essa integração — não o equipamento
+          isolado — que reduz ponto cego.</p>
+      </div>
+
+      <div class="niche-row reveal">
+        <div class="niche">
+          <span class="tag">Também operamos</span>
+          <h4>Rastreamento veicular</h4>
+          <p>GPS/GPRS para frotas, veículos particulares e localizadores discretos de objetos e pets.</p>
+        </div>
+        <div class="niche">
+          <span class="tag">Também operamos</span>
+          <h4>Gravação esportiva</h4>
+          <p>Multi-ângulo em 4K para quadras e campos — replay de lances e análise de desempenho.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ENGENHARIA (teaser) ============ -->
+  <section class="stage tech" id="engenharia">
+    <div class="container">
+      <div class="tech-grid">
+        <div>
+          <div class="phone">
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-topbar"><span>09:41</span><span>ESCALAS PM</span></div>
+                <div class="phone-title">Escalas</div>
+                <div class="phone-card">
+                  <div class="cap">Faturamento do mês</div>
+                  <div class="bar-row">
+                    <i style="height:40%"></i><i style="height:65%"></i><i style="height:50%"></i>
+                    <i style="height:85%"></i><i style="height:60%"></i><i style="height:95%"></i><i style="height:70%"></i>
+                  </div>
+                </div>
+                <div class="phone-card phone-list">
+                  <div><span>Seg · Dejem</span><span>07:00–19:00</span></div>
+                  <div><span>Qua · Delegada</span><span>19:00–07:00</span></div>
+                  <div><span>Sex · Bravos</span><span>07:00–19:00</span></div>
+                </div>
+                <div class="phone-fab">+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-copy">
+          <span class="eyebrow pulse">02 · Tecnologia própria</span>
+          <h2 style="font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.7rem,3.4vw,2.5rem);color:#fff;margin:0 0 20px;text-wrap:balance;">Não é um app.<br>É um portfólio.</h2>
+          <p class="body">Além de projetar sistemas de segurança, a L-Vision constrói o próprio software: um ERP
+            para empresas de segurança (Sniper), um app de escalas e plantões (Escalas PM), um app de finanças
+            com IA aberto ao público (L-Finanças), e um sistema de transporte escolar em desenvolvimento — quatro
+            produtos reais, não protótipos de vitrine.</p>
+
+          <div class="hero-ctas" style="margin-bottom:20px;">
+            <a href="engenharia.html" class="btn btn-pulse">Ver o portfólio completo →</a>
+          </div>
+          <p class="tech-fine">Também desenvolvemos sob demanda: sites, aplicativos e agentes de Inteligência
+            Artificial para outras empresas — a mesma engenharia aplicada fora da segurança.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJETOS ============ -->
+  <section class="stage" id="projetos">
+    <div class="container">
+      <div class="stage-head reveal">
+        <span class="eyebrow">03 · Dossiês de projeto</span>
+        <h2>Evidência, não promessa.</h2>
+        <p>Três instalações recentes, com escopo e resultado reais — formato de demonstração; os dossiês finais
+          trazem fotos e planta do projeto.</p>
+      </div>
+
+      <div class="dossiers reveal">
+        <article class="dossier">
+          <svg viewBox="0 0 300 110" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="20" width="260" height="70" fill="none" stroke="#8a6a1a" stroke-width="1.5"/>
+            <line x1="120" y1="20" x2="120" y2="90" stroke="#8a6a1a" stroke-width="1"/>
+            <line x1="200" y1="20" x2="200" y2="90" stroke="#8a6a1a" stroke-width="1"/>
+            <circle cx="30" cy="30" r="4" fill="#8a6a1a"/><circle cx="270" cy="30" r="4" fill="#8a6a1a"/>
+            <circle cx="30" cy="80" r="4" fill="#8a6a1a"/><circle cx="270" cy="80" r="4" fill="#8a6a1a"/>
+          </svg>
+          <div class="dossier-top"><span class="tag">Dossiê 014</span><h4>Condomínio Vila Clara</h4><div class="loc">Perus — São Paulo/SP</div></div>
+          <div class="dossier-body">
+            <dl>
+              <dt>Escopo</dt><dd>24 câmeras 4K + acesso facial em 3 portarias</dd>
+              <dt>Resultado</dt><dd>Zero ocorrências registradas em 6 meses</dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="dossier">
+          <svg viewBox="0 0 300 110" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="30" width="260" height="50" fill="none" stroke="#8a6a1a" stroke-width="1.5"/>
+            <rect x="40" y="20" width="30" height="70" fill="none" stroke="#8a6a1a" stroke-width="1"/>
+            <rect x="230" y="20" width="30" height="70" fill="none" stroke="#8a6a1a" stroke-width="1"/>
+            <circle cx="55" cy="25" r="4" fill="#8a6a1a"/><circle cx="245" cy="25" r="4" fill="#8a6a1a"/>
+          </svg>
+          <div class="dossier-top"><span class="tag">Dossiê 021</span><h4>Galpão logístico</h4><div class="loc">Cajamar/SP</div></div>
+          <div class="dossier-body">
+            <dl>
+              <dt>Escopo</dt><dd>Perímetro com 40 sensores + CFTV térmico</dd>
+              <dt>Resultado</dt><dd>Cobertura total do pátio externo</dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="dossier">
+          <svg viewBox="0 0 300 110" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="25" width="240" height="60" fill="none" stroke="#8a6a1a" stroke-width="1.5"/>
+            <line x1="150" y1="25" x2="150" y2="85" stroke="#8a6a1a" stroke-width="1" stroke-dasharray="4 3"/>
+            <circle cx="150" cy="55" r="14" fill="none" stroke="#8a6a1a" stroke-width="1"/>
+            <circle cx="40" cy="35" r="4" fill="#8a6a1a"/><circle cx="260" cy="35" r="4" fill="#8a6a1a"/>
+          </svg>
+          <div class="dossier-top"><span class="tag">Dossiê 009</span><h4>Quadra poliesportiva</h4><div class="loc">Jaraguá — São Paulo/SP</div></div>
+          <div class="dossier-body">
+            <dl>
+              <dt>Escopo</dt><dd>Gravação multi-ângulo 4K para replay</dd>
+              <dt>Resultado</dt><dd>Em uso por 3 equipes de base</dd>
+            </dl>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AUTHORITY ============ -->
+  <div class="authority" id="empresa">
+    <div class="container">
+      <div class="authority-row">
+        <span><b>Certificação</b> Intelbras</span>
+        <span><b>Certificação</b> Hikvision</span>
+        <span><b>CNPJ</b> 54.855.199/0001-69</span>
+        <span><b>Sede</b> Perus, São Paulo — SP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="stage final-cta" id="diagnostico">
+    <div class="container">
+      <span class="eyebrow" style="justify-content:center;display:flex;">Vamos começar</span>
+      <h2>Qual é o seu caso?</h2>
+      <p style="margin-left:auto;margin-right:auto;">Duas portas de entrada, dois times diferentes do lado de cá — cada uma leva direto a quem resolve o seu caso.</p>
+
+      <div class="path-grid reveal">
+        <a href="#" class="path signal">
+          <span class="tag">Segurança física</span>
+          <h3>Residência, condomínio ou empresa</h3>
+          <p>Diagnóstico técnico presencial gratuito para câmeras, alarme, acesso ou portaria.</p>
+          <span class="arrow">Solicitar diagnóstico →</span>
+        </a>
+        <a href="https://app.grupolvision.com.br" target="_blank" rel="noopener" class="path pulse">
+          <span class="tag">Tecnologia própria</span>
+          <h3>Sou profissional de segurança</h3>
+          <p>Crie sua conta gratuita no Escalas PM e organize suas escalas hoje.</p>
+          <span class="arrow">Acessar o Escalas PM →</span>
+        </a>
+      </div>
+
+      <p class="direct-contact">Prefere falar direto? <a href="https://wa.me/5511954285958" target="_blank" rel="noopener">WhatsApp (11) 95428-5958</a> · <a href="mailto:thiagoleal@grupolvision.com.br">thiagoleal@grupolvision.com.br</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#topo" class="wordmark"><span class="px"></span>L·VISION</a>
+        <p>Engenharia de segurança eletrônica e tecnologia própria. Perus, São Paulo — SP.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Sistemas</h5>
+        <a href="#sistemas">Câmeras (CFTV)</a>
+        <a href="#sistemas">Alarme</a>
+        <a href="#sistemas">Controle de acesso</a>
+        <a href="#sistemas">Portaria remota</a>
+      </div>
+      <div class="footer-col">
+        <h5>Empresa</h5>
+        <a href="#engenharia">Engenharia</a>
+        <a href="#projetos">Projetos</a>
+        <a href="#empresa">Certificações</a>
+        <a href="#diagnostico">Diagnóstico</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contato</h5>
+        <a href="https://wa.me/5511954285958" target="_blank" rel="noopener">(11) 95428-5958</a>
+        <a href="mailto:thiagoleal@grupolvision.com.br">thiagoleal@grupolvision.com.br</a>
+        <a href="https://instagram.com/lvision.s.e" target="_blank" rel="noopener">@lvision.s.e</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© <span id="year"></span> L-Vision Segurança Eletrônica LTDA · CNPJ 54.855.199/0001-69</div>
+      <div class="legal"><a href="#">Política de Privacidade</a><a href="#">Termos de Serviço</a></div>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/5511954285958" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3 9 3 16c0 2.4.7 4.7 1.9 6.7L3 29l6.5-1.8c1.9 1 4 1.6 6.5 1.6 7 0 13-6 13-13S23 3 16 3zm0 23.7c-2.1 0-4.1-.6-5.8-1.6l-.4-.2-4 1.1 1.1-3.9-.3-.4C5.5 20 4.9 18 4.9 16 4.9 10 10 4.9 16 4.9S27.1 10 27.1 16 22 26.7 16 26.7zm6.9-8.2c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.3-.9 1.2-1.1 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.6.2-.2.2-.4.3-.6.1-.2.1-.5 0-.7-.1-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.3 1.2-1.3 3s1.3 3.5 1.5 3.7c.2.2 2.6 4 6.3 5.5.9.4 1.6.6 2.1.7.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5z"/></svg>
+</a>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+var navToggle = document.getElementById('navToggle');
+var mobileNav = document.getElementById('mobileNav');
+navToggle.addEventListener('click', function(){
+  var open = mobileNav.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open);
+  navToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+});
+mobileNav.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){
+    mobileNav.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', false);
+    navToggle.setAttribute('aria-label', 'Abrir menu');
+  });
+});
+
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold:.15 });
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+} else {
+  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+}
+
+/* ---- Radar / operations panel canvas ---- */
+(function(){
+  var canvas = document.getElementById('radar');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var size = 440;
+
+  function fit(){
+    var box = canvas.parentElement.getBoundingClientRect();
+    size = box.width;
+    canvas.width = size * DPR;
+    canvas.height = size * DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  fit();
+  window.addEventListener('resize', fit);
+
+  var nodes = [
+    {x:.28,y:.32,c:'#ff9d2e'},{x:.7,y:.24,c:'#29e0c4'},{x:.62,y:.62,c:'#ff9d2e'},
+    {x:.22,y:.7,c:'#ff9d2e'},{x:.82,y:.55,c:'#29e0c4'},{x:.45,y:.48,c:'#ff9d2e'}
+  ];
+  var angle = 0;
+  var lastFlash = -1;
+
+  function draw(){
+    var w = size, h = size, cx = w/2, cy = h/2, r = w*.46;
+    ctx.clearRect(0,0,w,h);
+
+    // grid
+    ctx.strokeStyle = 'rgba(255,255,255,.05)';
+    ctx.lineWidth = 1;
+    for(var gx=1; gx<8; gx++){ ctx.beginPath(); ctx.moveTo(w*gx/8,0); ctx.lineTo(w*gx/8,h); ctx.stroke(); }
+    for(var gy=1; gy<8; gy++){ ctx.beginPath(); ctx.moveTo(0,h*gy/8); ctx.lineTo(w,h*gy/8); ctx.stroke(); }
+
+    // rings
+    ctx.strokeStyle = 'rgba(255,255,255,.08)';
+    [.25,.5,.75,1].forEach(function(f){ ctx.beginPath(); ctx.arc(cx,cy,r*f,0,Math.PI*2); ctx.stroke(); });
+
+    // sweep gradient
+    var grad = ctx.createConicGradient ? ctx.createConicGradient(angle, cx, cy) : null;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    if(grad){
+      grad.addColorStop(0, 'rgba(255,157,46,.28)');
+      grad.addColorStop(0.06, 'rgba(255,157,46,.05)');
+      grad.addColorStop(0.14, 'rgba(255,157,46,0)');
+      grad.addColorStop(1, 'rgba(255,157,46,0)');
+      ctx.fillStyle = grad;
+      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fill();
+    } else {
+      ctx.arc(cx,cy,r,angle,angle+0.5);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(255,157,46,.12)';
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // sweep line
+    ctx.strokeStyle = 'rgba(255,157,46,.9)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.lineTo(cx + r*Math.cos(angle), cy + r*Math.sin(angle));
+    ctx.stroke();
+
+    // nodes
+    nodes.forEach(function(n, i){
+      var nx = n.x*w, ny = n.y*h;
+      var dist = Math.hypot(nx-cx, ny-cy);
+      var nodeAngle = Math.atan2(ny-cy, nx-cx);
+      var diff = Math.abs(((angle - nodeAngle + Math.PI*3) % (Math.PI*2)) - Math.PI);
+      var near = diff > Math.PI - 0.35;
+      ctx.beginPath();
+      ctx.arc(nx, ny, near ? 4.5 : 3, 0, Math.PI*2);
+      ctx.fillStyle = near ? n.c : 'rgba(255,255,255,.35)';
+      ctx.fill();
+      if(near){
+        ctx.beginPath();
+        ctx.arc(nx, ny, 9, 0, Math.PI*2);
+        ctx.strokeStyle = n.c;
+        ctx.globalAlpha = .5;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    });
+
+    // center dot
+    ctx.beginPath(); ctx.arc(cx,cy,2.5,0,Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
+  }
+
+  function loop(){
+    if(!reduceMotion){ angle += 0.012; }
+    draw();
+    requestAnimationFrame(loop);
+  }
+  draw();
+  if(!reduceMotion) requestAnimationFrame(loop);
+})();
+</script>
