@@ -40,6 +40,14 @@ RewriteRule . /index.php [L]
 
 # END WordPress
 
+# Evita cache agressivo em páginas HTML (o bloco WordPress acima cacheia por 2h,
+# o que atrasa a visibilidade de qualquer atualização do site para os visitantes).
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php82” package as the default “PHP” programming language.
 <IfModule mime_module>
